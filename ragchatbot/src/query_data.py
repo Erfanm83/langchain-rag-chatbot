@@ -4,16 +4,10 @@ from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
+from config.config import OPENAI_API_KEY
 import openai
-import os
-from dotenv import load_dotenv
 
-# Load environment variables. Assumes that project contains .env file with API keys
-load_dotenv()
-#---- Set OpenAI API key 
-# Change environment variable name from "OPENAI_API_KEY" to the name given in 
-# your .env file.
-openai.api_key = os.environ['OPENAI_API_KEY']
+openai.api_key = OPENAI_API_KEY
 
 CHROMA_PATH = "chroma"
 
