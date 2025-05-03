@@ -9,6 +9,7 @@ APP_PORT = int(os.getenv("APP_PORT", 8000))
 APP_RELOAD = os.getenv("APP_RELOAD", "True")
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+TOKEN_RETRIEVAL_SECRET = os.getenv("TOKEN_RETRIEVAL_SECRET")
 
 RATE_LIMIT = os.getenv("RATE_LIMIT", 60)
 TIME_WINDOW = os.getenv("TIME_WINDOW", 60)
@@ -31,3 +32,5 @@ if not RATE_LIMIT:
     raise RuntimeError("RATE_LIMIT not found in environment variables.")
 if not TIME_WINDOW:
     raise RuntimeError("TIME_WINDOW not found in environment variables.")
+if not TOKEN_RETRIEVAL_SECRET:
+    raise RuntimeError("TOKEN_RETRIEVAL_SECRET not found in environment variables.")
