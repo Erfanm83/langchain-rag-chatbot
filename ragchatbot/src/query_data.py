@@ -1,5 +1,4 @@
 import argparse
-# from dataclasses import dataclass
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
@@ -9,7 +8,7 @@ import openai
 
 openai.api_key = OPENAI_API_KEY
 
-CHROMA_PATH = "chroma"
+CHROMA_PATH = "knowledge_base/chroma"
 
 PROMPT_TEMPLATE = """
 Answer the question based only on the following context:
@@ -22,12 +21,7 @@ Answer the question based on the above context: {question}
 """
 
 
-def main():
-    # Create CLI.
-    parser = argparse.ArgumentParser()
-    parser.add_argument("query_text", type=str, help="The query text.")
-    args = parser.parse_args()
-    query_text = args.query_text
+def ask(query_text: str):
 
     # Prepare the DB.
     embedding_function = OpenAIEmbeddings()
@@ -51,6 +45,3 @@ def main():
     formatted_response = f"Response: {response_text}\nSources: {sources}"
     print(formatted_response)
 
-
-if __name__ == "__main__":
-    main()
