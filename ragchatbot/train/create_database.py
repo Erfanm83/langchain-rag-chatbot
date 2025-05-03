@@ -18,22 +18,23 @@ load_dotenv()
 openai.api_key = os.environ['OPENAI_API_KEY']
 
 CHROMA_PATH = "chroma"
-DATA_PATH = "data/sample_chats"
-
-
-def main():
-    generate_data_store()
-
+DATA_PATH = "train/data/books"
 
 def generate_data_store():
+    print("GORGALII 1")
     documents = load_documents()
+    print("GORGALII 2")
     chunks = split_text(documents)
+    print("GORGALII 3")
     save_to_chroma(chunks)
+    print("GORGALII 4")
 
 
 def load_documents():
     loader = DirectoryLoader(DATA_PATH, glob="*.md")
     documents = loader.load()
+    print("YES")
+    # print(f"document : {documents}")
     return documents
 
 
@@ -65,7 +66,3 @@ def save_to_chroma(chunks: list[Document]):
     )
     db.persist()
     print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
-
-
-if __name__ == "__main__":
-    main()

@@ -1,12 +1,12 @@
 from typing import Dict
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-from fastapi import FastAPI, HTTPException, Request, Header, status
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.requests import Request
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import Chroma
-from langchain.chains import RetrievalQA
 from src.security import is_rate_limited
+from config.config import TOKEN_RETRIEVAL_SECRET
+from src.rag import generate_answer
+import uuid
 
 # One-time valid tokens
 one_time_tokens = set()
@@ -14,7 +14,7 @@ one_time_tokens = set()
 app = FastAPI(
     title="SalesChatBot API",
     summary="This API receives question as a json and returns an answer based on its knowledge base trained before.",
-    version="1.1.2",
+    version="1.0.0",
     contact={
         "name": "Erfan Mahmoudi",
         "email": "e.mahmoudi@greenweb.ir",
@@ -60,6 +60,13 @@ class RateLimitResponse(BaseErrorResponse):
 class InternalServerErrorResponse(BaseErrorResponse):
     detail: str = Field(..., example="خطایی سمت سرور رخ داده است")
 
+class ChatRequest(BaseModel):
+    question: str = Field(..., example="اسمت چیه ؟?")
+    token: str = Field(..., example="550e8400-e29b-41d4-a716-446655440000")
+
+class ChatResponse(BaseModel):
+    answer: str = Field(..., example="من سروریار هستم دستیار فروش ایران سرور")
+
 @app.post(
     "/get_token/",
     summary="Generate a one-time-use token",
@@ -99,28 +106,30 @@ async def get_token(
     one_time_tokens.add(new_token)
     return {"token": new_token}
 
-# @app.post("/documents/index")
-# async def index(token: str = Depends(oauth2_scheme)):
-#     conn = sqlite3.connect("db.sqlite")
-#     docs = conn.execute("SELECT id, text FROM raw_documents WHERE indexed=0").fetchall()
-#     texts = [d[1] for d in docs]
-#     db = Chroma.from_texts(texts, OpenAIEmbeddings(), persist_directory="chroma_db")
-#     db.persist()
-#     conn.executemany("UPDATE raw_documents SET indexed=1 WHERE id=?", [(d[0],) for d in docs])
-#     conn.commit()
-#     return {"status": "indexed", "count": len(docs)}
+@app.post(
+        "/chat",
+        response_model=ChatResponse,
+        responses={
+            403: {"model": ForbiddenResponse, "description": "When token is invalid"},
+            422: {"model": ValidationResponse, "description": "Input format validation error"},
+            500: {"model": InternalServerErrorResponse, "description": "Internal server error"},
+        }
+        )
+async def chat(request: ChatRequest):
+    if request.token not in one_time_tokens:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="توکن نامعتبر یا منقضی شده است"
+        )
+    # Remove token after use
+    one_time_tokens.remove(request.token)
 
-# --- Query ---
-# class QueryRequest(BaseModel):
-#     question: str
-#     top_k: int = 5
-
-# @app.post("/query")
-# async def query(req: QueryRequest, token: str = Depends(oauth2_scheme)):
-#     db = Chroma(persist_directory="chroma_db", embedding_function=OpenAIEmbeddings())
-#     qa = RetrievalQA.from_chain_type(llm=OpenAI(), chain_type="stuff", retriever=db.as_retriever(search_kwargs={"k": req.top_k}))
-#     answer = qa.run(req.question)
-#     # Call Goftino
-#     async with httpx.AsyncClient() as client:
-#         await client.post("https://api.goftino.com/track", json={"q": req.question, "a": answer}, headers={"Authorization": f"Bearer {GOFTINO_API_KEY}"})
-#     return {"answer": answer}
+    try:
+        # Call the generate_answer function from rag.py
+        answer = generate_answer(request.question)
+        return {"answer": answer}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"خطایی در پردازش سوال رخ داده است: {str(e)}"
+        )
