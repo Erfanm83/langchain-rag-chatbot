@@ -115,22 +115,32 @@ Response:
 
 ```
 .
-├── client/
-│   └── chat_ui.py           # Streamlit chat interface
-├── config/
-│   ├── config.py            # Configuration settings
-│   └── logging_config.py    # Logging configuration
-├── data/
-│   └── prototype/           # Place your markdown files here
-├── knowledge_base/
-│   └── create_database.py   # Script to create the vector database
-├── src/
-│   ├── main.py              # FastAPI app and endpoints
-│   ├── rag.py               # RAG implementation
-│   └── security.py          # Security utilities
-├── .env                     # Environment variables
-├── run.py                   # Script to run the API server
-└── train.py                 # Script to train the bot
+├── client
+│   └── chat_ui.py
+├── config
+│   ├── config.py
+│   └── logging_config.py
+├── run.py
+├── src
+│   ├── main.py
+│   ├── query_data.py
+│   ├── rag.py
+│   └── security.py
+└── train
+    ├── __pycache__
+    │   └── create_database.cpython-39.pyc
+    ├── compare_embeddings.py
+    ├── create_database.py
+    ├── data
+    │   ├── books
+    │   │   └── alice_in_wonderland.md
+    │   ├── prototype
+    │   │   └── test.md
+    │   └── sample_chats
+    │       └── sample_chat_cleaned.md
+    └── train.py
+
+9 directories, 15 files
 ```
 
 ## License
