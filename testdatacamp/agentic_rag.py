@@ -5,7 +5,7 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
-from crewai_tools import SerperDevTool
+from crewai_tools import SerperDevTool, ScrapeWebsiteTool
 from crewai import Agent, Task, Crew, LLM
 
 load_dotenv() 
@@ -15,7 +15,7 @@ GEMINI=os.getenv("GEMINI_API_KEY")
 
 # Initialize LLM
 llm = ChatGroq(
-    model="llama-3.3-70b-specdec",
+    model="llama3-8b-8192",
     temperature=0,
     max_tokens=500,
     timeout=None,
