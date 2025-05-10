@@ -4,5 +4,5 @@ chroma_*
 chroma
 .DS_Store
 __pycache__
-merged.md
+sample_chat_cleaned.md
 sample_chat.txt

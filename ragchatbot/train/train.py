@@ -5,7 +5,7 @@ This will process all markdown files in the data directory and create a Chroma d
 
 import os
 import sys
-from create_database import generate_data_store
+from create_database import create_database
 
 def main():
     # Check if the data directory exists
@@ -27,7 +27,7 @@ def main():
     # Run the training process
     print("Starting training process...")
     try:
-        generate_data_store()
+        create_database("./data/sample_chat_cleaned.md", "faiss_index")
         print("\n✅ Training completed successfully!")
         print("Your chatbot is now ready to use.")
         print("\nTo start the API server: python run.py")
