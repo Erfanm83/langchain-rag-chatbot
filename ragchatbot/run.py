@@ -15,9 +15,9 @@ handler.setFormatter(CustomFormatter())
 logger.addHandler(handler)
 
 if __name__ == "__main__":
-    if not os.path.exists("chroma"):
-        logging.warning("'chroma' directory not found!")
-        logging.critical("Please run 'python knowledge_base/create_database.py' first to create your knowledge base.")
+    if not os.path.exists("train/faiss_index"):
+        logging.warning("'faiss_index' directory not found!")
+        logging.critical("Please run 'python train/train.py' first to create your knowledge base.")
         choice = input("Do you want to continue anyway? (y/n): ")
         if choice.lower() != 'y':
             raise RuntimeError

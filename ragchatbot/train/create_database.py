@@ -3,11 +3,11 @@ import re
 import shutil
 from dotenv import load_dotenv
 from langchain.docstore.document import Document
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 
 load_dotenv()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 def create_database(text_file_path: str, persist_path: str = "faiss_index"):
     """Reads a text file, splits it into chunks, and saves a FAISS vector store."""
@@ -38,7 +38,9 @@ def create_database(text_file_path: str, persist_path: str = "faiss_index"):
     print(f"Split file into {len(documents)} chunks")
 
     # Create vector DB
-    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
+    embeddings = OpenAIEmbeddings(
+        openai_api_key=OPENAI_API_KEY
+    )
     vector_db = FAISS.from_documents(documents, embeddings)
 
     # Persist if needed

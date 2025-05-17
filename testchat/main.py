@@ -1,55 +1,21 @@
 import os
 from dotenv import load_dotenv
-from langchain.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
-from langchain_groq import ChatGroq
+from langchain.chat_models import ChatOpenAI
 import re
 
 load_dotenv() 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY") 
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Initialize LLM
-llm = ChatGroq(
-    model="deepseek-r1-distill-llama-70b",
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
     temperature=0,
     max_tokens=700,
-    timeout=None,
-    max_retries=2,
+    openai_api_key=OPENAI_API_KEY
 )
-
-# def setup_vector_db(text_file_path):
-#     """Setup vector database from a text file"""
-#     # Load and chunk text file
-#     loader = TextLoader(text_file_path)
-#     documents = loader.load()
-    
-#     text_splitter = RecursiveCharacterTextSplitter(
-#         separators=[
-#         "----------------------------------------",  # Exact match for common separator
-#         "-------------------------------------",     # Alternative length
-#         "-----------------------------------------", # Alternative length
-#         "\n\n----------------------------------------\n\n", # Separated sections
-#         "\n----------------------------------------\n",     # Another variation
-#         "\n\n",  # Double newline - typically separates message groups
-#         "\n",    # Single newline - typically separates individual messages
-#         " ",     # Word boundaries as last resort
-#         ],
-#         chunk_size=500,
-#         chunk_overlap=50
-#         # length_function=len
-#     )
-#     chunks = text_splitter.split_documents(documents)
-    
-#     # Create vector database
-#     embeddings = HuggingFaceEmbeddings(
-#         model_name="sentence-transformers/all-mpnet-base-v2"
-#     )
-#     vector_db = FAISS.from_documents(chunks, embeddings)
-    
-#     return vector_db
 
 def setup_vector_db(text_file_path):
     """Setup vector database from a text file using custom splitting by dash separators"""
@@ -87,8 +53,8 @@ def setup_vector_db(text_file_path):
     print(f"Split file into {len(documents)} conversation chunks")
     
     # Create vector database
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-mpnet-base-v2"
+    embeddings = OpenAIEmbeddings(
+        openai_api_key=OPENAI_API_KEY
     )
     vector_db = FAISS.from_documents(documents, embeddings)
     
@@ -204,7 +170,7 @@ def remove_think_section(text):
 
 def main():
     # Setup with text file
-    text_file_path = "sample_chat.txt"
+    text_file_path = "sample_chat_persian.txt"
     
     # Initialize vector database
     print("Setting up vector database...")
@@ -216,9 +182,7 @@ def main():
     # Test queries
     test_queries = [
         """
-        The site is in the field of clothing
-        When the internet gets busy, the internets get into trouble. If I'm not mistaken, the .ir domains were open for a while and the other domains had problems
-        I want the site to still be open if the internets get into trouble
+        سلام وقت بخیر، ایرانسل سایتی که رو هاست وردپرس خارج ازایران شما میزبانی میشه باز نمیکنه شما چه راه حلی دارید
         """
     ]
     

@@ -1,6 +1,5 @@
 import streamlit as st
 import requests
-import time
 
 # Set page title and favicon
 st.set_page_config(page_title="Sales ChatBot", page_icon="🤖")
@@ -58,7 +57,7 @@ for message in st.session_state.messages:
 # Configuration in sidebar
 with st.sidebar:
     st.header("Configuration")
-    api_url = st.text_input("API URL", value="http://127.0.0.1:8080", help="The URL of your FastAPI server")
+    api_url = st.text_input("API URL", value="http://127.0.0.1:8000", help="The URL of your FastAPI server")
     secret = st.text_input("🔑 API Secret Key", type="password", help="Secret key for authentication")
 
 # Input form

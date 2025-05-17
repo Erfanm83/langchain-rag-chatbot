@@ -1,12 +1,13 @@
-from langchain_community.vectorstores import Chroma
+from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from config.config import OPENAI_API_KEY
 import openai
+import os
 
 openai.api_key = OPENAI_API_KEY
 
-CHROMA_PATH = "chroma"
+FAISS_PATH = "train/faiss_index"
 PROMPT_TEMPLATE = """
 Answer the question based only on the following context:
 
@@ -18,10 +19,15 @@ Answer the question based on the above context: {question}
 """
 
 def generate_answer(question: str) -> str:
-    """Query the vector DB and return the AI’s answer."""
-    # 1. Load embeddings & persistence
+    """Query the FAISS vector DB and return the AI’s answer."""
+    
+    # 1. Load embeddings & FAISS index
     embedding_fn = OpenAIEmbeddings()
-    db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_fn)
+    
+    if not os.path.exists(FAISS_PATH):
+        return "پایگاه داده پیدا نشد. لطفاً ابتدا ایندکس را بسازید."
+    
+    db = FAISS.load_local(FAISS_PATH, embeddings=embedding_fn, allow_dangerous_deserialization=True)
 
     # 2. Do a similarity search
     results = db.similarity_search_with_relevance_scores(question, k=3)
